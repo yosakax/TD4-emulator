@@ -4,7 +4,7 @@ use crate::{opcode::OpCode, port::Port, register::Register, rom::Rom};
 
 pub struct Cpu {
     pub pc: u8,
-    carry: bool,
+    pub carry: bool,
     pub rom: Rom,
     register: Register,
     pub port: Port,
@@ -34,14 +34,17 @@ impl Cpu {
 
     pub fn execute(&mut self) {
         let (opcode, operand) = self.fetch();
+        // eprintln!("{:?} {:04b}", opcode, operand);
         match opcode {
             OpCode::AddA => {
                 self.register.a += operand;
                 self.carry = self.register.a >> 4 & 1 == 1;
+                self.register.a &= 0b1111;
             }
             OpCode::AddB => {
                 self.register.b += operand;
                 self.carry = self.register.b >> 4 & 1 == 1;
+                self.register.b &= 0b1111;
             }
             OpCode::MovA => {
                 self.register.a = operand;
@@ -81,7 +84,7 @@ impl Cpu {
                 return;
             }
             OpCode::Jnc => {
-                if self.carry {
+                if !self.carry {
                     self.pc = operand;
                     return;
                 }
