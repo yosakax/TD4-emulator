@@ -24,6 +24,9 @@ impl Cpu {
     pub fn load_file(&mut self, file_path: &str) {
         self.rom.load_bin(file_path);
     }
+    pub fn load_file_mnimonic(&mut self, file_path: &str) {
+        self.rom.load_mnemonic(file_path);
+    }
 
     fn fetch(&mut self) -> (OpCode, u8) {
         let memory = self.rom.memory[self.pc as usize];
