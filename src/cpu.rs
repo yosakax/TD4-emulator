@@ -24,6 +24,7 @@ impl Cpu {
     pub fn load_file(&mut self, file_path: &str) {
         self.rom.load_bin(file_path);
     }
+    /// @brief 独自ルールのニーモニックファイルを解釈する
     pub fn load_file_mnimonic(&mut self, file_path: &str) {
         self.rom.load_mnemonic(file_path);
     }
