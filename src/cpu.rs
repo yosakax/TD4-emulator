@@ -101,3 +101,52 @@ impl Cpu {
         self.pc = (self.pc + 1) & 0b1111;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn mov_a_immediate_sets_a_and_pc() {
+        let mut cpu = Cpu::new();
+        // MovA 5 -> opcode 0b0011, operand 0x5
+        cpu.rom.memory[0] = (0b0011 << 4) | 0x5;
+        cpu.execute();
+        assert_eq!(cpu.register.a, 5);
+        assert_eq!(cpu.pc, 1);
+        assert_eq!(cpu.carry, false);
+    }
+
+    #[test]
+    fn add_a_overflow_sets_carry_and_wraps() {
+        let mut cpu = Cpu::new();
+        cpu.register.a = 0b1111;
+        cpu.rom.memory[0] = (0b0000 << 4) | 0x1; // AddA 1
+        cpu.execute();
+        assert_eq!(cpu.register.a, 0);
+        assert_eq!(cpu.carry, true);
+    }
+
+    #[test]
+    fn jmp_sets_pc_directly() {
+        let mut cpu = Cpu::new();
+        cpu.rom.memory[0] = (0b1111 << 4) | 0x7; // Jmp 7
+        cpu.execute();
+        assert_eq!(cpu.pc, 7);
+    }
+
+    #[test]
+    fn in_and_out_operations() {
+        let mut cpu = Cpu::new();
+        cpu.port.input = 0x3;
+        cpu.rom.memory[0] = (0b0010 << 4) | 0x0; // InA (operand ignored)
+        cpu.execute();
+        assert_eq!(cpu.register.a, 3);
+
+        // set register b and use OutB
+        cpu.register.b = 0xA & 0xF;
+        cpu.rom.memory[1] = (0b1001 << 4) | 0x0; // OutB
+        cpu.execute();
+        assert_eq!(cpu.port.output, cpu.register.b);
+    }
+}

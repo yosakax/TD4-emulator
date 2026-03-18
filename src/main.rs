@@ -1,5 +1,6 @@
 mod cpu;
 mod opcode;
+mod parser;
 mod port;
 mod register;
 mod rom;
